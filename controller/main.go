@@ -120,6 +120,10 @@ func getMaxmind(ip string) (map[string]interface{}, error) {
 				"name": getCountry(city.RegisteredCountry.Names),
 			}
 		}
+		if city.Location.Latitude != 0 && city.Location.Longitude != 0 {
+			ret["latitude"] = city.Location.Latitude
+			ret["longitude"] = city.Location.Longitude
+		}
 		var regions []string
 		for _, subdivision := range city.Subdivisions {
 			regions = append(regions, getDescription(subdivision.Names))
