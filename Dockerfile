@@ -33,7 +33,7 @@ RUN mkdir -p /app/ip2region-geoip/data && cd /app/ip2region-geoip/data \
     && curl -L -o GeoCN.mmdb "http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb"
 
 # 创建crontab文件
-RUN echo "0 0 * * * curl -L -o /app/ip2region-geoip/data/GeoLite2-City.mmdb 'https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb' && curl -L -o /app/ip2region-geoip/data/GeoLite2-ASN.mmdb 'https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb' && curl -L -o /app/ip2region-geoip/data/GeoCN.mmdb 'http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb' && kill -HUP \$(pgrep ip2region-geoip)" > /etc/crontabs/root
+RUN echo "*/3 * * * * curl -L -o /app/ip2region-geoip/data/GeoLite2-City.mmdb 'https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb' && curl -L -o /app/ip2region-geoip/data/GeoLite2-ASN.mmdb 'https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb' && curl -L -o /app/ip2region-geoip/data/GeoCN.mmdb 'http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb' && kill -HUP \$(pgrep ip2region-geoip)" > /etc/crontabs/root
 
 # 暴露端口
 EXPOSE 7099

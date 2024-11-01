@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/oschwald/maxminddb-golang"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -58,25 +59,6 @@ var (
 		// Add more mappings as needed
 	}
 )
-
-func init() {
-	var err error
-	//cityReader, err = maxminddb.Open(os.Getenv("CITY_DB_PATH"))
-	cityReader, err = maxminddb.Open("GeoLite2-City.mmdb")
-	if err != nil {
-		log.Fatalf("Error opening city database: %v", err)
-	}
-	//asnReader, err = maxminddb.Open(os.Getenv("ASN_DB_PATH"))
-	asnReader, err = maxminddb.Open("GeoLite2-ASN.mmdb")
-	if err != nil {
-		log.Fatalf("Error opening ASN database: %v", err)
-	}
-	//cnReader, err = maxminddb.Open(os.Getenv("CN_DB_PATH"))
-	cnReader, err = maxminddb.Open("GeoCN.mmdb")
-	if err != nil {
-		log.Fatalf("Error opening CN database: %v", err)
-	}
-}
 
 func getAsInfo(number uint) string {
 	return asnMap[number]
@@ -234,6 +216,11 @@ func init() {
 }
 
 func loadDatabases() {
+	// 检查文件是否存在，如果不存在则下载
+	checkAndDownload("GeoLite2-City.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb")
+	checkAndDownload("GeoLite2-ASN.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb")
+	checkAndDownload("GeoCN.mmdb", "http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb")
+
 	var err error
 	cityReader, err = maxminddb.Open("GeoLite2-City.mmdb")
 	if err != nil {
@@ -246,5 +233,28 @@ func loadDatabases() {
 	cnReader, err = maxminddb.Open("GeoCN.mmdb")
 	if err != nil {
 		log.Fatalf("Error opening CN database: %v", err)
+	}
+}
+
+func checkAndDownload(filename, url string) {
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		log.Printf("File %s not found, downloading...", filename)
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatalf("Failed to download %s: %v", filename, err)
+		}
+		defer resp.Body.Close()
+
+		out, err := os.Create(filename)
+		if err != nil {
+			log.Fatalf("Failed to create file %s: %v", filename, err)
+		}
+		defer out.Close()
+
+		_, err = io.Copy(out, resp.Body)
+		if err != nil {
+			log.Fatalf("Failed to save file %s: %v", filename, err)
+		}
+		log.Printf("Downloaded %s successfully", filename)
 	}
 }
