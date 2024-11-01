@@ -188,7 +188,7 @@ func main() {
 
 	// 处理没有参数的情况，使用请求方的 IP
 	r.GET("/ip", func(c *gin.Context) {
-		ip := c.ClientIP()
+		ip := getRealClientIP(c)
 		info := getIpInfo(ip)
 		c.JSON(http.StatusOK, info)
 	})
@@ -207,6 +207,20 @@ func main() {
 	if err := r.Run(":7099"); err != nil {
 		log.Fatal(err)
 	}
+}
+
+// getRealClientIP 尝试从多个头部信息获取真实 IP，如果没有则使用 c.ClientIP()
+func getRealClientIP(c *gin.Context) string {
+	// 尝试从 X-Forwarded-For 头获取
+	if xff := c.GetHeader("X-Forwarded-For"); xff != "" {
+		return xff
+	}
+	// 尝试从 X-Real-IP 头获取
+	if xrip := c.GetHeader("X-Real-IP"); xrip != "" {
+		return xrip
+	}
+	// 默认使用 Gin 的 ClientIP 方法
+	return c.ClientIP()
 }
 
 func init() {
