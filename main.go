@@ -9,9 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/signal"
 	"sync"
-	"syscall"
 	"time"
 )
 
@@ -188,17 +186,11 @@ func getIpInfo(ip string) map[string]interface{} {
 func main() {
 	r := gin.Default()
 
-	r.GET("/", func(c *gin.Context) {
-		ip := c.Query("ip")
+	r.GET("/ip/:ip", func(c *gin.Context) {
+		ip := c.Param("ip")
 		if ip == "" {
 			ip = c.ClientIP()
 		}
-		info := getIpInfo(ip)
-		c.JSON(http.StatusOK, info)
-	})
-
-	r.GET("/:ip", func(c *gin.Context) {
-		ip := c.Param("ip")
 		info := getIpInfo(ip)
 		c.JSON(http.StatusOK, info)
 	})
@@ -212,16 +204,6 @@ func main() {
 
 func init() {
 	loadDatabases()
-	// 监听SIGHUP信号以重新加载数据库
-	go func() {
-		sighup := make(chan os.Signal, 1)
-		signal.Notify(sighup, syscall.SIGHUP)
-		for {
-			<-sighup
-			log.Println("Received SIGHUP, reloading databases...")
-			loadDatabases()
-		}
-	}()
 }
 
 func loadDatabases() {
