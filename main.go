@@ -213,14 +213,18 @@ func main() {
 func getRealClientIP(c *gin.Context) string {
 	// 尝试从 X-Forwarded-For 头获取
 	if xff := c.GetHeader("X-Forwarded-For"); xff != "" {
+		log.Printf("X-Forwarded-For IP: %s", xff)
 		return xff
 	}
 	// 尝试从 X-Real-IP 头获取
 	if xrip := c.GetHeader("X-Real-IP"); xrip != "" {
+		log.Printf("X-Real-IP: %s", xrip)
 		return xrip
 	}
 	// 默认使用 Gin 的 ClientIP 方法
-	return c.ClientIP()
+	clientIP := c.ClientIP()
+	log.Printf("Default ClientIP: %s", clientIP)
+	return clientIP
 }
 
 func init() {
