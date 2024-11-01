@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -213,8 +214,13 @@ func main() {
 func getRealClientIP(c *gin.Context) string {
 	// 尝试从 X-Forwarded-For 头获取
 	if xff := c.GetHeader("X-Forwarded-For"); xff != "" {
-		log.Printf("X-Forwarded-For IP: %s", xff)
-		return xff
+		// 分割 X-Forwarded-For 字符串，获取第一个 IP 地址
+		ips := strings.Split(xff, ",")
+		if len(ips) > 0 {
+			realIP := strings.TrimSpace(ips[0]) // 清除可能的空格
+			log.Printf("X-Forwarded-For IP: %s", realIP)
+			return realIP
+		}
 	}
 	// 尝试从 X-Real-IP 头获取
 	if xrip := c.GetHeader("X-Real-IP"); xrip != "" {
