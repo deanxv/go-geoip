@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	"time"
 )
 
 // ASN represents the ASN database structure.
@@ -58,6 +60,7 @@ var (
 		9812: "东方有线", 9389: "中国长城", 17962: "天威视讯",
 		// Add more mappings as needed
 	}
+	mu sync.Mutex
 )
 
 func getAsInfo(number uint) string {
@@ -103,6 +106,8 @@ func getMaxmind(ip string) (map[string]interface{}, error) {
 	}
 
 	var asn ASN
+	mu.Lock()
+	defer mu.Unlock()
 	if err := asnReader.Lookup(parsedIP, &asn); err == nil {
 		asInfo := map[string]interface{}{
 			"number": asn.Number,
@@ -149,6 +154,8 @@ func getCn(ip string, info map[string]interface{}) {
 	}
 
 	var geoCN GeoCN
+	mu.Lock()
+	defer mu.Unlock()
 	if network, ok, err := cnReader.LookupNetwork(parsedIP, &geoCN); err == nil && ok {
 		info["addr"] = network.String()
 		regions := deDuplicate([]string{geoCN.Province, geoCN.City, geoCN.Districts})
@@ -196,7 +203,9 @@ func main() {
 		c.JSON(http.StatusOK, info)
 	})
 
-	if err := r.Run(":8080"); err != nil {
+	go scheduleDatabaseUpdate()
+
+	if err := r.Run(":7099"); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -217,11 +226,13 @@ func init() {
 
 func loadDatabases() {
 	// 检查文件是否存在，如果不存在则下载
-	checkAndDownload("GeoLite2-City.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb")
-	checkAndDownload("GeoLite2-ASN.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb")
-	checkAndDownload("GeoCN.mmdb", "http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb")
+	downloadAndSave("GeoLite2-City.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb")
+	downloadAndSave("GeoLite2-ASN.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb")
+	downloadAndSave("GeoCN.mmdb", "http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb")
 
 	var err error
+	mu.Lock()
+	defer mu.Unlock()
 	cityReader, err = maxminddb.Open("GeoLite2-City.mmdb")
 	if err != nil {
 		log.Fatalf("Error opening city database: %v", err)
@@ -236,25 +247,36 @@ func loadDatabases() {
 	}
 }
 
-func checkAndDownload(filename, url string) {
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		log.Printf("File %s not found, downloading...", filename)
-		resp, err := http.Get(url)
-		if err != nil {
-			log.Fatalf("Failed to download %s: %v", filename, err)
-		}
-		defer resp.Body.Close()
+func downloadAndSave(filename, url string) {
+	log.Printf("Downloading %s...", filename)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalf("Failed to download %s: %v", filename, err)
+	}
+	defer resp.Body.Close()
 
-		out, err := os.Create(filename)
-		if err != nil {
-			log.Fatalf("Failed to create file %s: %v", filename, err)
-		}
-		defer out.Close()
+	out, err := os.Create(filename)
+	if err != nil {
+		log.Fatalf("Failed to create file %s: %v", filename, err)
+	}
+	defer out.Close()
 
-		_, err = io.Copy(out, resp.Body)
-		if err != nil {
-			log.Fatalf("Failed to save file %s: %v", filename, err)
+	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		log.Fatalf("Failed to save file %s: %v", filename, err)
+	}
+	log.Printf("Downloaded and saved %s successfully", filename)
+}
+
+func scheduleDatabaseUpdate() {
+	ticker := time.NewTicker(3 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			log.Println("Updating databases...")
+			loadDatabases()
 		}
-		log.Printf("Downloaded %s successfully", filename)
 	}
 }
