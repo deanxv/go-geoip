@@ -127,7 +127,7 @@ func scheduleDatabaseUpdate() {
 
 	// 设置定时任务
 	for {
-		nextUpdateTime := getNextSundayMidnight()
+		nextUpdateTime := getNextSundayLastSecond()
 		durationUntilUpdate := time.Until(nextUpdateTime)
 		log.Printf("Next database update scheduled at %s, which is in %v.", nextUpdateTime, durationUntilUpdate)
 
@@ -139,15 +139,15 @@ func scheduleDatabaseUpdate() {
 	}
 }
 
-// getNextSundayMidnight calculates the next Sunday midnight time from now
-func getNextSundayMidnight() time.Time {
+// getNextSundayLastSecond calculates the next Sunday last second time from now
+func getNextSundayLastSecond() time.Time {
 	now := time.Now()
 	// Calculate how many days to next Sunday (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
 	daysUntilSunday := (7 - int(now.Weekday())) % 7
 	if daysUntilSunday == 0 && now.Hour() >= 0 { // If today is Sunday and it's past midnight, wait another week
 		daysUntilSunday = 7
 	}
-	// Set to next Sunday midnight
-	nextSundayMidnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).Add(time.Duration(daysUntilSunday) * 24 * time.Hour)
-	return nextSundayMidnight
+	// Set to next Sunday last second
+	nextSundayLastSecond := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.Location()).Add(time.Duration(daysUntilSunday) * 24 * time.Hour)
+	return nextSundayLastSecond
 }

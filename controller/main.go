@@ -17,13 +17,13 @@ func Ip(c *gin.Context) {
 		ip = c.ClientIP()
 	}
 	info := getIpInfo(ip)
-	c.JSON(http.StatusOK, info)
+	common.SendResponse(c, http.StatusOK, 0, "success", info)
 }
 
 func IpNoArgs(c *gin.Context) {
 	ip := getRealClientIP(c)
 	info := getIpInfo(ip)
-	c.JSON(http.StatusOK, info)
+	common.SendResponse(c, http.StatusOK, 0, "success", info)
 }
 
 // getRealClientIP 尝试从多个头部信息获取真实 IP，如果没有则使用 c.ClientIP()
