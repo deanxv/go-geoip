@@ -28,7 +28,7 @@ RUN apk --no-cache add ca-certificates tzdata
 COPY --from=builder /ip2region-geoip .
 
 # 暴露端口
-EXPOSE 7088
+EXPOSE 7099
 # 工作目录
 WORKDIR /app/ip2region-geoip/data
 # 设置入口命令
