@@ -186,6 +186,13 @@ func getIpInfo(ip string) map[string]interface{} {
 func main() {
 	r := gin.Default()
 
+	// 处理没有参数的情况，使用请求方的 IP
+	r.GET("/ip", func(c *gin.Context) {
+		ip := c.ClientIP()
+		info := getIpInfo(ip)
+		c.JSON(http.StatusOK, info)
+	})
+
 	r.GET("/ip/:ip", func(c *gin.Context) {
 		ip := c.Param("ip")
 		if ip == "" {
