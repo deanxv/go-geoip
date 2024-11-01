@@ -122,16 +122,32 @@ func downloadAndSave(filename, url string) {
 }
 
 func scheduleDatabaseUpdate() {
+	// 立即执行一次数据库加载
 	loadDatabases()
 
-	ticker := time.NewTicker(3 * time.Minute)
-	defer ticker.Stop()
-
+	// 设置定时任务
 	for {
-		select {
-		case <-ticker.C:
-			log.Println("Updating databases...")
-			loadDatabases()
-		}
+		nextUpdateTime := getNextSundayMidnight()
+		durationUntilUpdate := time.Until(nextUpdateTime)
+		log.Printf("Next database update scheduled at %s, which is in %v.", nextUpdateTime, durationUntilUpdate)
+
+		timer := time.NewTimer(durationUntilUpdate)
+		<-timer.C
+
+		log.Println("Updating databases...")
+		loadDatabases()
 	}
+}
+
+// getNextSundayMidnight calculates the next Sunday midnight time from now
+func getNextSundayMidnight() time.Time {
+	now := time.Now()
+	// Calculate how many days to next Sunday (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+	daysUntilSunday := (7 - int(now.Weekday())) % 7
+	if daysUntilSunday == 0 && now.Hour() >= 0 { // If today is Sunday and it's past midnight, wait another week
+		daysUntilSunday = 7
+	}
+	// Set to next Sunday midnight
+	nextSundayMidnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).Add(time.Duration(daysUntilSunday) * 24 * time.Hour)
+	return nextSundayMidnight
 }
