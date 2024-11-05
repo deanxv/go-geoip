@@ -1,7 +1,7 @@
 package config
 
 import (
-	"ip2region-geoip/common/env"
+	"go-geoip/common/env"
 	"os"
 	"strings"
 	"time"
@@ -14,8 +14,11 @@ var DebugEnabled = strings.ToLower(os.Getenv("DEBUG")) == "true"
 var SessionSecret = uuid.New().String()
 
 var RateLimitKeyExpirationDuration = 20 * time.Minute
+var SwaggerEnable = os.Getenv("SWAGGER_ENABLE")
 var ApiSecret = os.Getenv("API_SECRET")
 var ApiSecrets = strings.Split(os.Getenv("API_SECRET"), ",")
+
+var CityDBRemoteUrl = os.Getenv("CITY_DB_REMOTE_URL")
 
 var (
 	RequestRateLimitNum            = env.Int("REQUEST_RATE_LIMIT", 120)

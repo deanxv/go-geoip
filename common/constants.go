@@ -11,9 +11,9 @@ var Version = "v1.0.0"            // this hard coding will be replaced automatic
 
 var (
 	CityReader, AsnReader, CnReader *maxminddb.Reader
-	AsnMap                          = map[uint]string{
-		9812: "东方有线", 9389: "中国长城", 17962: "天威视讯",
-		// Add more mappings as needed
-	}
+	//AsnMap                          = map[uint]string{
+	//	9812: "东方有线", 9389: "中国长城", 17962: "天威视讯",
+	//	// Add more mappings as needed
+	//}
 	Mu sync.Mutex
 )

@@ -19,10 +19,10 @@ var (
 var UploadPath = "upload"
 
 func printHelp() {
-	fmt.Println("ip2region-geoip" + Version + "")
+	fmt.Println("go-geoip" + Version + "")
 	fmt.Println("Copyright (C) 2024 Dean. All rights reserved.")
-	//fmt.Println("GitHub: https://github.com/deanxv/ip2region-geoip ")
-	fmt.Println("Usage: ip2region-geoip [--port <port>] [--log-dir <log directory>] [--version] [--help]")
+	//fmt.Println("GitHub: https://github.com/deanxv/go-geoip ")
+	fmt.Println("Usage: go-geoip [--port <port>] [--log-dir <log directory>] [--version] [--help]")
 }
 
 func init() {

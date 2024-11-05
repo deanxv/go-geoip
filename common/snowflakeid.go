@@ -2,7 +2,7 @@ package common
 
 import (
 	"fmt"
-	logger "ip2region-geoip/common/loggger"
+	logger "go-geoip/common/loggger"
 	"sync"
 	"time"
 

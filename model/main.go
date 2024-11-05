@@ -45,3 +45,17 @@ type GeoCN struct {
 	ISP       string `maxminddb:"isp"`
 	Net       string `maxminddb:"net"`
 }
+
+type IPInfoResponse struct {
+	Addr              string   `json:"addr" swaggertype:"string" description:"地址"`
+	ASN               string   `json:"asn" swaggertype:"string" description:"asn"`
+	Country           string   `json:"country" swaggertype:"string" description:"国家"`
+	IP                string   `json:"ip" swaggertype:"string" description:"ip"`
+	Latitude          float64  `json:"latitude" swaggertype:"string" description:"纬度"`
+	Longitude         float64  `json:"longitude" swaggertype:"string" description:"经度"`
+	Subdivisions      []string `json:"subdivisions" swaggertype:"array,string" description:"分区"`
+	Province          string   `json:"province" swaggertype:"string" description:"省"`
+	City              string   `json:"city" swaggertype:"string" description:"市"`
+	District          string   `json:"district" swaggertype:"string" description:"区"`
+	RegisteredCountry string   `json:"registered_country" swaggertype:"string" description:"注册国家"`
+}

@@ -2,7 +2,7 @@ import os
 import requests
 
 issue_labels = ['no respect']
-github_repo = 'deanxv/ip2region-geoip'
+github_repo = 'deanxv/go-geoip'
 github_token = os.getenv("GITHUB_TOKEN")
 headers = {
     'Authorization': 'Bearer ' + github_token,

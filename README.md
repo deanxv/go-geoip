@@ -1,6 +1,6 @@
 <div align="center">
 
-# IP2Region-GeoIP
+# go-geoip
 
 
 </div>
@@ -24,14 +24,14 @@ docker-compose pull && docker-compose up -d
 version: '3.4'
 
 services:
-  ip2region-geoip:
-    image: deanxv/ip2region-geoip:latest
-    container_name: ip2region-geoip
+  go-geoip:
+    image: deanxv/go-geoip:latest
+    container_name: go-geoip
     restart: always
     ports:
       - "7099:7099"
     volumes:
-      - ./data:/app/ip2region-geoip/data
+      - ./data:/app/go-geoip/data
     environment:
       - API_SECRET=123456  # [可选]修改此行为请求头校验的值（前后端统一）
       - TZ=Asia/Shanghai
@@ -40,17 +40,17 @@ services:
 ### 基于 Docker 进行部署
 
 ```docker
-docker run --name ip2region-geoip -d --restart always \
+docker run --name go-geoip -d --restart always \
 -p 7099:7099 \
--v $(pwd)/data:/app/ip2region-geoip/data \
+-v $(pwd)/data:/app/go-geoip/data \
 -e API_SECRET="123456" \
 -e TZ=Asia/Shanghai \
-deanxv/ip2region-geoip
+deanxv/go-geoip
 ```
 
 其中`API_SECRET`修改为自己的。
 
-如果上面的镜像无法拉取,可以尝试使用 GitHub 的 Docker 镜像,将上面的`deanxv/ip2region-geoip`替换为`ghcr.io/deanxv/ip2region-geoip`即可。
+如果上面的镜像无法拉取,可以尝试使用 GitHub 的 Docker 镜像,将上面的`deanxv/go-geoip`替换为`ghcr.io/deanxv/go-geoip`即可。
 
 ### 部署到第三方平台
 

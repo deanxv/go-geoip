@@ -3,8 +3,8 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/samber/lo"
-	"ip2region-geoip/common"
-	"ip2region-geoip/common/config"
+	"go-geoip/common"
+	"go-geoip/common/config"
 	"net/http"
 	"strings"
 )

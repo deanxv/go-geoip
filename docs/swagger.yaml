@@ -1,0 +1,51 @@
+definitions:
+  model.IPInfoResponse:
+    properties:
+      addr:
+        type: string
+      asn:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+      district:
+        type: string
+      ip:
+        type: string
+      latitude:
+        type: string
+      longitude:
+        type: string
+      province:
+        type: string
+      registered_country:
+        type: string
+      subdivisions:
+        items:
+          type: string
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /ip/{ip}:
+    get:
+      description: IP查询
+      parameters:
+      - description: IP address
+        in: path
+        name: ip
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/model.IPInfoResponse'
+      summary: IP查询
+      tags:
+      - IP查询
+swagger: "2.0"

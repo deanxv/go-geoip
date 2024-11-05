@@ -25,12 +25,12 @@ jobs:
       - name: Build Backend
         run: |
           go mod download
-          go build -ldflags "-X 'ip2region-geoip/common.Version=$(git describe --tags)'" -o ip2region-geoip-macos
+          go build -ldflags "-X 'go-geoip/common.Version=$(git describe --tags)'" -o go-geoip-macos
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: ip2region-geoip-macos
+          files: go-geoip-macos
           draft: false
           generate_release_notes: true
         env:

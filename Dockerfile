@@ -16,7 +16,7 @@ RUN go mod download
 
 # 复制整个项目并构建可执行文件
 COPY . .
-RUN go build -o /ip2region-geoip
+RUN go build -o /go-geoip
 
 # 使用 Alpine 镜像作为最终镜像
 FROM alpine
@@ -25,11 +25,11 @@ FROM alpine
 RUN apk --no-cache add ca-certificates tzdata
 
 # 从构建阶段复制可执行文件
-COPY --from=builder /ip2region-geoip .
+COPY --from=builder /go-geoip .
 
 # 暴露端口
 EXPOSE 7099
 # 工作目录
-WORKDIR /app/ip2region-geoip/data
+WORKDIR /app/go-geoip/data
 # 设置入口命令
-ENTRYPOINT ["/ip2region-geoip"]
+ENTRYPOINT ["/go-geoip"]

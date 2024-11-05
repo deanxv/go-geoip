@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"github.com/gin-gonic/gin"
-	"ip2region-geoip/common/helper"
+	"go-geoip/common/helper"
 )
 
 func RequestId() func(c *gin.Context) {

@@ -2,102 +2,96 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
-	"github.com/gin-gonic/gin"
-	"github.com/oschwald/maxminddb-golang"
 	"io"
-	"ip2region-geoip/common"
-	"ip2region-geoip/common/config"
-	logger "ip2region-geoip/common/loggger"
-	"ip2region-geoip/middleware"
-	"ip2region-geoip/router"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-gonic/gin"
+	"github.com/oschwald/maxminddb-golang"
+	"go-geoip/common"
+	"go-geoip/common/config"
+	logger "go-geoip/common/loggger"
+	"go-geoip/middleware"
+	"go-geoip/router"
+)
+
+const (
+	cityDBDefaultURL = "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb"
+	asnDBURL         = "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb"
+	cnDBURL          = "http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb"
+	sessionName      = "session"
 )
 
 func main() {
 	logger.SetupLogger()
-	logger.SysLog(fmt.Sprintf("ip2region-geoip %s started", common.Version))
+	logger.SysLog(fmt.Sprintf("go-geoip %s started", common.Version))
 
-	if os.Getenv("GIN_MODE") != "debug" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-	if config.DebugEnabled {
-		logger.SysLog("running in debug mode")
-	}
-	var err error
+	setGinMode()
+	logDebugMode()
 
-	server := gin.New()
-	server.Use(gin.Recovery())
-	server.Use(middleware.RequestId())
-	middleware.SetUpLogger(server)
-	store := cookie.NewStore([]byte(config.SessionSecret))
-	server.Use(sessions.Sessions("session", store))
-
-	router.SetRouter(server)
-	var port = os.Getenv("PORT")
-	if port == "" {
-		port = strconv.Itoa(*common.Port)
-	}
+	server := setupServer()
 
 	go scheduleDatabaseUpdate()
 
-	err = server.Run(":" + port)
-	if err != nil {
-		logger.FatalLog("failed to start HTTP server: " + err.Error())
+	runServer(server)
+}
+
+func setGinMode() {
+	if os.Getenv("GIN_MODE") != "debug" {
+		gin.SetMode(gin.ReleaseMode)
 	}
 }
 
-//func main() {
-//	r := gin.Default()
-//
-//	// 处理没有参数的情况，使用请求方的 IP
-//	r.GET("/ip", func(c *gin.Context) {
-//		ip := getRealClientIP(c)
-//		info := getIpInfo(ip)
-//		c.JSON(http.StatusOK, info)
-//	})
-//
-//	r.GET("/ip/:ip", func(c *gin.Context) {
-//		ip := c.Param("ip")
-//		if ip == "" {
-//			ip = c.ClientIP()
-//		}
-//		info := getIpInfo(ip)
-//		c.JSON(http.StatusOK, info)
-//	})
-//
-//
-//	if err := r.Run(":7099"); err != nil {
-//		log.Fatal(err)
-//	}
-//}
+func logDebugMode() {
+	if config.DebugEnabled {
+		logger.SysLog("running in debug mode")
+	}
+}
+
+func setupServer() *gin.Engine {
+	server := gin.New()
+	server.Use(gin.Recovery(), middleware.RequestId())
+	middleware.SetUpLogger(server)
+
+	store := cookie.NewStore([]byte(config.SessionSecret))
+	server.Use(sessions.Sessions(sessionName, store))
+
+	router.SetRouter(server)
+	return server
+}
+
+func runServer(server *gin.Engine) {
+	port := getPort()
+	if err := server.Run(":" + port); err != nil {
+		log.Fatalf("failed to start HTTP server: %v", err)
+	}
+}
+
+func getPort() string {
+	if port := os.Getenv("PORT"); port != "" {
+		return port
+	}
+	return strconv.Itoa(*common.Port)
+}
 
 func loadDatabases() {
-	// 检查文件是否存在，如果不存在则下载
-	downloadAndSave("GeoLite2-City.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb")
-	downloadAndSave("GeoLite2-ASN.mmdb", "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb")
-	downloadAndSave("GeoCN.mmdb", "http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb")
+	// downloadAndSave("GeoIP-City.mmdb", getCityDBURL())
+	// downloadAndSave("Geo-ASN.mmdb", asnDBURL)
+	// downloadAndSave("GeoCN.mmdb", cnDBURL)
 
-	var err error
-	common.Mu.Lock()
-	defer common.Mu.Unlock()
-	common.CityReader, err = maxminddb.Open("GeoLite2-City.mmdb")
-	if err != nil {
-		log.Fatalf("Error opening city database: %v", err)
+	openDatabases()
+}
+
+func getCityDBURL() string {
+	if config.CityDBRemoteUrl != "" {
+		return config.CityDBRemoteUrl
 	}
-	common.AsnReader, err = maxminddb.Open("GeoLite2-ASN.mmdb")
-	if err != nil {
-		log.Fatalf("Error opening ASN database: %v", err)
-	}
-	common.CnReader, err = maxminddb.Open("GeoCN.mmdb")
-	if err != nil {
-		log.Fatalf("Error opening CN database: %v", err)
-	}
+	return cityDBDefaultURL
 }
 
 func downloadAndSave(filename, url string) {
@@ -114,18 +108,36 @@ func downloadAndSave(filename, url string) {
 	}
 	defer out.Close()
 
-	_, err = io.Copy(out, resp.Body)
-	if err != nil {
+	if _, err := io.Copy(out, resp.Body); err != nil {
 		log.Fatalf("Failed to save file %s: %v", filename, err)
 	}
 	log.Printf("Downloaded and saved %s successfully", filename)
 }
 
+func openDatabases() {
+	var err error
+	common.Mu.Lock()
+	defer common.Mu.Unlock()
+
+	common.CityReader, err = maxminddb.Open("GeoIP-City.mmdb")
+	if err != nil {
+		log.Fatalf("Error opening city database: %v", err)
+	}
+
+	common.AsnReader, err = maxminddb.Open("Geo-ASN.mmdb")
+	if err != nil {
+		log.Fatalf("Error opening ASN database: %v", err)
+	}
+
+	common.CnReader, err = maxminddb.Open("GeoCN.mmdb")
+	if err != nil {
+		log.Fatalf("Error opening CN database: %v", err)
+	}
+}
+
 func scheduleDatabaseUpdate() {
-	// 立即执行一次数据库加载
 	loadDatabases()
 
-	// 设置定时任务
 	for {
 		nextUpdateTime := getNextSundayLastSecond()
 		durationUntilUpdate := time.Until(nextUpdateTime)
@@ -139,15 +151,11 @@ func scheduleDatabaseUpdate() {
 	}
 }
 
-// getNextSundayLastSecond calculates the next Sunday last second time from now
 func getNextSundayLastSecond() time.Time {
 	now := time.Now()
-	// Calculate how many days to next Sunday (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
 	daysUntilSunday := (7 - int(now.Weekday())) % 7
-	if daysUntilSunday == 0 && now.Hour() >= 0 { // If today is Sunday and it's past midnight, wait another week
+	if daysUntilSunday == 0 && now.Hour() >= 0 {
 		daysUntilSunday = 7
 	}
-	// Set to next Sunday last second
-	nextSundayLastSecond := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.Location()).Add(time.Duration(daysUntilSunday) * 24 * time.Hour)
-	return nextSundayLastSecond
+	return time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, now.Location()).Add(time.Duration(daysUntilSunday) * 24 * time.Hour)
 }

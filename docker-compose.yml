@@ -2,13 +2,13 @@ version: '3.4'
 
 services:
   coze-discord-proxy:
-    image: deanxv/ip2region-geoip:latest
-    container_name: ip2region-geoip
+    image: deanxv/go-geoip:latest
+    container_name: go-geoip
     restart: always
     ports:
       - "7099:7099"
     volumes:
-      - ./data:/app/ip2region-geoip/data
+      - ./data:/app/go-geoip/data
     environment:
       - API_SECRET=123456  # [可选]修改此行为请求头校验的值（前后端统一）
       - TZ=Asia/Shanghai

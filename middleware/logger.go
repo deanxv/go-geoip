@@ -3,7 +3,7 @@ package middleware
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"ip2region-geoip/common/helper"
+	"go-geoip/common/helper"
 )
 
 func SetUpLogger(server *gin.Engine) {

@@ -3,9 +3,9 @@ package logger
 import (
 	"context"
 	"fmt"
+	"go-geoip/common/config"
+	"go-geoip/common/helper"
 	"io"
-	"ip2region-geoip/common/config"
-	"ip2region-geoip/common/helper"
 	"log"
 	"os"
 	"path/filepath"
@@ -27,7 +27,7 @@ var setupLogOnce sync.Once
 func SetupLogger() {
 	setupLogOnce.Do(func() {
 		if LogDir != "" {
-			logPath := filepath.Join(LogDir, fmt.Sprintf("ip2region-geoip-%s.log", time.Now().Format("20060102")))
+			logPath := filepath.Join(LogDir, fmt.Sprintf("go-geoip-%s.log", time.Now().Format("20060102")))
 			fd, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			if err != nil {
 				log.Fatal("failed to open log file")

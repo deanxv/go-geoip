@@ -3,8 +3,8 @@ package helper
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go-geoip/common/random"
 	"html/template"
-	"ip2region-geoip/common/random"
 	"log"
 	"net"
 	"os/exec"
