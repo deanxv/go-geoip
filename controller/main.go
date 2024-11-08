@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-geoip/common"
+	logger "go-geoip/common/loggger"
 	"go-geoip/model"
-	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -46,16 +46,16 @@ func getRealClientIP(c *gin.Context) string {
 		ips := strings.Split(xff, ",")
 		if len(ips) > 0 {
 			realIP := strings.TrimSpace(ips[0])
-			log.Printf("X-Forwarded-For IP: %s", realIP)
+			logger.Info(c, fmt.Sprintf("X-Forwarded-For IP: %s", realIP))
 			return realIP
 		}
 	}
 	if xrip := c.GetHeader("X-Real-IP"); xrip != "" {
-		log.Printf("X-Real-IP: %s", xrip)
+		logger.Info(c, fmt.Sprintf("X-Real-IP: %s", xrip))
 		return xrip
 	}
 	clientIP := c.ClientIP()
-	log.Printf("Default ClientIP: %s", clientIP)
+	logger.Info(c, fmt.Sprintf("Default ClientIP: %s", clientIP))
 	return clientIP
 }
 

@@ -68,7 +68,7 @@ func setupServer() *gin.Engine {
 func runServer(server *gin.Engine) {
 	port := getPort()
 	if err := server.Run(":" + port); err != nil {
-		log.Fatalf("failed to start HTTP server: %v", err)
+		logger.FatalLog("failed to start HTTP server: %v", err)
 	}
 }
 
@@ -80,9 +80,9 @@ func getPort() string {
 }
 
 func loadDatabases() {
-	// downloadAndSave("GeoIP-City.mmdb", getCityDBURL())
-	// downloadAndSave("Geo-ASN.mmdb", asnDBURL)
-	// downloadAndSave("GeoCN.mmdb", cnDBURL)
+	downloadAndSave("GeoIP-City.mmdb", getCityDBURL())
+	downloadAndSave("Geo-ASN.mmdb", asnDBURL)
+	downloadAndSave("GeoCN.mmdb", cnDBURL)
 
 	openDatabases()
 }
@@ -95,23 +95,23 @@ func getCityDBURL() string {
 }
 
 func downloadAndSave(filename, url string) {
-	log.Printf("Downloading %s...", filename)
+	logger.SysLog(fmt.Sprintf("Downloading %s...", filename))
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalf("Failed to download %s: %v", filename, err)
+		logger.FatalLog("Failed to download %s: %v", filename, err)
 	}
 	defer resp.Body.Close()
 
 	out, err := os.Create(filename)
 	if err != nil {
-		log.Fatalf("Failed to create file %s: %v", filename, err)
+		logger.FatalLog("Failed to create file %s: %v", filename, err)
 	}
 	defer out.Close()
 
 	if _, err := io.Copy(out, resp.Body); err != nil {
-		log.Fatalf("Failed to save file %s: %v", filename, err)
+		logger.FatalLog("Failed to save file %s: %v", filename, err)
 	}
-	log.Printf("Downloaded and saved %s successfully", filename)
+	logger.SysLog(fmt.Sprintf("Downloaded and saved %s successfully", filename))
 }
 
 func openDatabases() {
@@ -121,17 +121,17 @@ func openDatabases() {
 
 	common.CityReader, err = maxminddb.Open("GeoIP-City.mmdb")
 	if err != nil {
-		log.Fatalf("Error opening city database: %v", err)
+		logger.FatalLog("Error opening city database: %v", err)
 	}
 
 	common.AsnReader, err = maxminddb.Open("Geo-ASN.mmdb")
 	if err != nil {
-		log.Fatalf("Error opening ASN database: %v", err)
+		logger.FatalLog("Error opening ASN database: %v", err)
 	}
 
 	common.CnReader, err = maxminddb.Open("GeoCN.mmdb")
 	if err != nil {
-		log.Fatalf("Error opening CN database: %v", err)
+		logger.FatalLog("Error opening CN database: %v", err)
 	}
 }
 
@@ -141,7 +141,7 @@ func scheduleDatabaseUpdate() {
 	for {
 		nextUpdateTime := getNextSundayLastSecond()
 		durationUntilUpdate := time.Until(nextUpdateTime)
-		log.Printf("Next database update scheduled at %s, which is in %v.", nextUpdateTime, durationUntilUpdate)
+		logger.SysLog(fmt.Sprintf("Next database update scheduled at %s, which is in %v.", nextUpdateTime, durationUntilUpdate))
 
 		timer := time.NewTimer(durationUntilUpdate)
 		<-timer.C
