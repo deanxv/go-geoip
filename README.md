@@ -89,6 +89,7 @@ deanxv/go-geoip
 5. 添加环境变量
 
    `API_SECRET:123456` [可选]接口密钥-修改此行为请求头校验的值(多个请以,分隔)
+   `TZ:Asia/Shanghai`
 
 保存。
 
@@ -115,4 +116,4 @@ Render 可以直接部署 docker 镜像,不需要 fork 仓库：[Render](https:/
 ### 环境变量
 
 1. `API_SECRET=123456`  [可选]接口密钥-修改此行为请求头校验的值(多个请以,分隔)
-2. `CITY_DB_REMOTE_URL`  [可选]city.mmdb远程地址
+2. `CITY_DB_REMOTE_URL:https://xxx.com/GeoIP2-City.mmdb`  [可选]city.mmdb远程地址
