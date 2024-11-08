@@ -6,12 +6,27 @@ _基于**MaxMind**的GeoIP库的IP信息查询服务_
 
 </div>
 
+## 功能
+
+点击打开 [✨演示](https://ip.goeast.io/ip)接口
+
+- [x] 获取本机或指定IP所在的**IP段**、**ASN**、**城市**、**经度**、**纬度**、**子区域**、**省市区**、**注册国家**。
+- [x] 定期(每周)更新GeoLite2库。
+- [x] 支持自定义City.mmdb远程地址。
+
 ### 接口文档:
 
 `http://<ip>:<port>/swagger/index.html`
 
-
 ### 示例:
+
+略
+
+## 如何使用
+
+1. 部署后访问`http://<ip>:<port>/swagger/index.html`查看接口文档。[可选]
+2. 使用`/ip`接口查询IP信息。例如：`http://<ip>:<port>/ip`
+3. 使用`/ip/{ip}`接口查询指定IP信息。例如：`http://<ip>:<port>/ip/8.8.8.8`
 
 ### 基于 Docker-Compose(All In One) 进行部署
 
@@ -63,7 +78,6 @@ deanxv/go-geoip
 
 点击一键部署:
 
-
 **一键部署后 `API_SECRET`变量也需要替换！**
 
 或手动部署:
@@ -101,3 +115,4 @@ Render 可以直接部署 docker 镜像,不需要 fork 仓库：[Render](https:/
 ### 环境变量
 
 1. `API_SECRET=123456`  [可选]接口密钥-修改此行为请求头校验的值(多个请以,分隔)
+2. `CITY_DB_REMOTE_URL`  [可选]city.mmdb远程地址
