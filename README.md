@@ -4,11 +4,15 @@
 
 _基于**MaxMind**的GeoIP库的IP信息查询服务_
 
+[✨演示站](https://ip.aytsao.cn)
+
+[✨演示接口](https://ip.goeast.io/ip)
+
+[✨演示接口文档](https://ip.goeast.io/swagger/index.html)
 </div>
 
-## 功能
 
-点击打开 [✨演示接口](https://ip.goeast.io/ip)
+## 功能
 
 - [x] 获取本机或指定IP所在的**IP段**、**ASN**、**城市**、**经度**、**纬度**、**子区域**、**省市区**、**注册国家**。
 - [x] 定期(每周)更新GeoLite2库。
