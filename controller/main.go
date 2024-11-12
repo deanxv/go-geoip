@@ -70,7 +70,7 @@ func getIpInfo(ip string) (*model.IPInfoResponse, error) {
 	common.Mu.Lock()
 	defer common.Mu.Unlock()
 
-	if err := populateASNInfo(parsedIP, info); err != nil {
+	if err := populateASInfo(parsedIP, info); err != nil {
 		return nil, err
 	}
 
@@ -85,12 +85,12 @@ func getIpInfo(ip string) (*model.IPInfoResponse, error) {
 	return info, nil
 }
 
-func populateASNInfo(parsedIP net.IP, info *model.IPInfoResponse) error {
+func populateASInfo(parsedIP net.IP, info *model.IPInfoResponse) error {
 	var asn model.ASN
 	if err := common.AsnReader.Lookup(parsedIP, &asn); err != nil {
 		return err
 	}
-	info.ASN = asn.Organization
+	info.AS = asn.Organization
 	return nil
 }
 
@@ -122,9 +122,9 @@ func populateCnInfo(ip string, info *model.IPInfoResponse) {
 		info.Province = geoCN.Province
 		info.City = geoCN.City
 		info.District = geoCN.Districts
-		info.ASN = geoCN.ISP
+		info.AS = geoCN.ISP
 		if geoCN.Net != "" {
-			info.ASN += " (" + geoCN.Net + ")"
+			info.AS += " (" + geoCN.Net + ")"
 		}
 	}
 }

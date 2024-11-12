@@ -48,7 +48,7 @@ type GeoCN struct {
 
 type IPInfoResponse struct {
 	Addr              string   `json:"addr" swaggertype:"string" description:"地址"`
-	ASN               string   `json:"asn" swaggertype:"string" description:"asn"`
+	AS                string   `json:"as" swaggertype:"string" description:"as"`
 	Country           string   `json:"country" swaggertype:"string" description:"国家"`
 	IP                string   `json:"ip" swaggertype:"string" description:"ip"`
 	Latitude          float64  `json:"latitude" swaggertype:"string" description:"纬度"`
