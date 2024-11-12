@@ -24,7 +24,7 @@ _基于**MaxMind**的GeoIP库的IP信息查询服务_
 
 ### 示例:
 
-略
+<span><img src="docs/img.png" width="800"/></span>
 
 ## 如何使用
 
