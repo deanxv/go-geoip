@@ -78,9 +78,11 @@ deanxv/go-geoip
 <summary><strong>部署到 Zeabur</strong></summary>
 <div>
 
-> Zeabur 的服务器在国外,自动解决了网络的问题,同时免费的额度也足够个人使用
+> Zeabur 的服务器在国外,自动解决了网络的问题,~~同时免费的额度也足够个人使用~~
 
 点击一键部署:
+
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/3KXDY6?referralCode=deanxv)
 
 **一键部署后 `API_SECRET`变量也需要替换！**
 
