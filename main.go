@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -146,7 +145,7 @@ func scheduleDatabaseUpdate() {
 		timer := time.NewTimer(durationUntilUpdate)
 		<-timer.C
 
-		log.Println("Updating databases...")
+		logger.SysLog("Updating databases...")
 		loadDatabases()
 	}
 }

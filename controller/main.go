@@ -119,9 +119,16 @@ func populateCnInfo(ip string, info *model.IPInfoResponse) {
 	var geoCN model.GeoCN
 	if network, ok, err := common.CnReader.LookupNetwork(parsedIP, &geoCN); err == nil && ok {
 		info.Addr = network.String()
-		info.Province = geoCN.Province
-		info.City = geoCN.City
-		info.District = geoCN.Districts
+		if strings.HasSuffix(geoCN.Province, "市") {
+			info.Province = geoCN.Province
+			info.City = geoCN.Province
+			info.District = geoCN.City
+		} else {
+			info.Province = geoCN.Province
+			info.City = geoCN.City
+			info.District = geoCN.Districts
+		}
+
 		info.AS = geoCN.ISP
 		if geoCN.Net != "" {
 			info.AS += " (" + geoCN.Net + ")"
