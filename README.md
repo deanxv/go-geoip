@@ -4,11 +4,11 @@
 
 _基于**MaxMind**的GeoIP库的IP信息查询服务_
 
-[✨演示站](https://ip.aytsao.cn)
+[✨演示站](https://iplookup.pro)
 
-[✨演示接口](https://ip.goeast.io/ip)
+[✨演示接口](https://api8.iplookup.pro/ip)
 
-[✨演示接口文档](https://ip.goeast.io/swagger/index.html)
+[✨演示接口文档](https://api8.iplookup.pro/swagger/index.html)
 </div>
 
 
