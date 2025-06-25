@@ -19,6 +19,8 @@ var ApiSecret = os.Getenv("API_SECRET")
 var ApiSecrets = strings.Split(os.Getenv("API_SECRET"), ",")
 
 var CityDBRemoteUrl = os.Getenv("CITY_DB_REMOTE_URL")
+var AsnDBRemoteUrl = os.Getenv("ASN_DB_REMOTE_URL")
+var CnDBRemoteUrl = os.Getenv("CN_DB_REMOTE_URL")
 
 var (
 	RequestRateLimitNum            = env.Int("REQUEST_RATE_LIMIT", 120)

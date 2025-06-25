@@ -125,3 +125,5 @@ Render 可以直接部署 docker 镜像,不需要 fork 仓库：[Render](https:/
 1. `PORT=7099`  [可选]服务端口
 1. `API_SECRET=123456`  [可选]接口密钥-修改此行为请求头校验的值(多个请以,分隔)(请求header中增加 Authorization:Bearer 123456)
 2. `CITY_DB_REMOTE_URL=https://xxx.com/GeoIP2-City.mmdb`  [可选]city.mmdb远程地址
+3. `ASN_DB_REMOTE_URL=https://xxx.com/GeoLite2-ASN.mmdb`  [可选]ASN.mmdb远程地址
+4. `CN_DB_REMOTE_URL=https://xxx.com/GeoCN.mmdb`  [可选]CN.mmdb远程地址

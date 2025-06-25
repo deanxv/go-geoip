@@ -22,7 +22,7 @@ import (
 const (
 	cityDBDefaultURL = "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-City.mmdb"
 	asnDBURL         = "https://github.com/P3TERX/GeoLite.mmdb/raw/download/GeoLite2-ASN.mmdb"
-	cnDBURL          = "http://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb"
+	cnDBURL          = "https://github.com/ljxi/GeoCN/releases/download/Latest/GeoCN.mmdb"
 	sessionName      = "session"
 )
 
@@ -80,8 +80,8 @@ func getPort() string {
 
 func loadDatabases() {
 	downloadAndSave("GeoIP-City.mmdb", getCityDBURL())
-	downloadAndSave("Geo-ASN.mmdb", asnDBURL)
-	downloadAndSave("GeoCN.mmdb", cnDBURL)
+	downloadAndSave("Geo-ASN.mmdb", getAsnDBURL())
+	downloadAndSave("GeoCN.mmdb", getCnDBURL())
 
 	openDatabases()
 }
@@ -93,8 +93,22 @@ func getCityDBURL() string {
 	return cityDBDefaultURL
 }
 
+func getAsnDBURL() string {
+	if config.AsnDBRemoteUrl != "" {
+		return config.AsnDBRemoteUrl
+	}
+	return asnDBURL
+}
+
+func getCnDBURL() string {
+	if config.CnDBRemoteUrl != "" {
+		return config.CnDBRemoteUrl
+	}
+	return cnDBURL
+}
+
 func downloadAndSave(filename, url string) {
-	logger.SysLog(fmt.Sprintf("Downloading %s...", filename))
+	logger.SysLog(fmt.Sprintf("Downloading %s from %s...", filename, url))
 	resp, err := http.Get(url)
 	if err != nil {
 		logger.FatalLog("Failed to download %s: %v", filename, err)
